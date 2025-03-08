@@ -1,0 +1,126 @@
+<?php
+   
+namespace App\Http\Controllers\API;
+   
+use Illuminate\Http\Request;
+use App\Http\Controllers\API\BaseController as BaseController;
+use App\Models\Book;
+use Validator;
+use App\Http\Resources\BookResource;
+use Illuminate\Http\JsonResponse;
+   
+class BookController extends BaseController
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(): JsonResponse
+    {
+        $books = Book::all();
+    
+        return $this->sendResponse(BookResource::collection($books), 'books retrieved successfully.');
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $input = $request->all();
+   
+        $validator = Validator::make($input, [
+            'title' => 'required',
+            'author' => 'required',
+            'description' => 'nullable',
+            'isbn' => 'nullable',
+            'image' => 'nullable',
+        ]);
+   
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());       
+        }
+   
+        $book = Book::create($input);
+   
+        return $this->sendResponse(new BookResource($book), 'book created successfully.');
+    } 
+   
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id): JsonResponse
+    {
+        $book = Book::find($id);
+  
+        if (is_null($book)) {
+            return $this->sendError('book not found.');
+        }
+   
+        return $this->sendResponse(new BookResource($book), 'Book retrieved successfully.');
+    }
+    
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Book $book): JsonResponse
+    {
+        $input = $request->all();
+   
+        $validator = Validator::make($input, [
+            'title' => 'sometimes|string|',
+            'author' => 'sometimes|string|',
+            'description' => 'sometimes|string|',
+            'isbn' => 'sometimes|string|',
+            'image' => 'sometimes|string|',
+        ]);
+   
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());       
+        }
+
+        // only update if field is required to do so
+   
+        if (isset($input['title'])) {
+            $book->title = $input['title'];
+        }
+        if (isset($input['author'])) {
+            $book->author = $input['author'];
+        }
+        if (isset($input['description'])) {
+            $book->description = $input['description'];
+        }
+        if (isset($input['isbn'])) {
+            $book->isbn = $input['isbn'];
+        }
+        if (isset($input['image'])) {
+            $book->image = $input['image'];
+        }    
+        $book->save();
+   
+        return $this->sendResponse(new BookResource($book), 'book updated successfully.');
+    }
+   
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Book $book): JsonResponse
+    {
+        $book->delete();
+   
+        return $this->sendResponse([], 'book deleted successfully.');
+    }
+}
