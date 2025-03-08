@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\BookController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\AdminController;
+use App\Http\Middleware\AdminMiddleware;
 
    
 Route::controller(RegisterController::class)->group(function(){
@@ -26,4 +28,8 @@ Route::middleware('auth:sanctum')->group( function () {
 
 Route::middleware('auth:sanctum')->group( function () {
     Route::resource('users', UserController::class);
+});
+
+Route::middleware(['auth:sanctum','admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 });

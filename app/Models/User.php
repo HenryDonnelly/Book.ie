@@ -55,4 +55,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function isAdmin()
+    {
+        return $this->role_name === 'admin';
+    }
+
+    public function isPremium()
+    {
+        return $this->role_name === 'premium user';
+    }
+
 }
