@@ -65,5 +65,12 @@ class User extends Authenticatable
     {
         return $this->role_name === 'premium user';
     }
+    public function books()
+    {
+        return $this->belongsToMany(Book::class, 'book_user')
+                ->withPivot('condition', 'status', 'note')
+                ->withTimestamps();
+    }
+
 
 }

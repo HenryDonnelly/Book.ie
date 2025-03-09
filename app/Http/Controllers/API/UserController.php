@@ -18,6 +18,10 @@ class UserController extends BaseController
      */
     public function index(): JsonResponse
     {
+        if (auth()->user()->role_name !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $users = User::all();
     
         return $this->sendResponse(UserResource::collection($users), 'users retrieved successfully.');
@@ -45,7 +49,9 @@ class UserController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());       
         }
 
-        $input['role_name'] = 'Free User'; // force 
+        $input['role_name'] = 'free user'; // force 
+
+        $input['password'] = bcrypt($input['password']); //hash
 
    
         $user = User::create($input);
@@ -79,8 +85,12 @@ class UserController extends BaseController
      */
     public function update(Request $request, User $user): JsonResponse
     {
-        $input = $request->all();
-   
+        if (auth()->user()->role_name !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }   
+        
+        $input = $request->all(); 
+
         $validator = Validator::make($input, [
             'name'=> 'sometimes|string|',
             'email'=> 'sometimes|email|unique:users,email',
@@ -93,6 +103,8 @@ class UserController extends BaseController
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());       
         }
+
+        $input = $request->all();
 
         // only update if field is required to do so
    
@@ -127,6 +139,11 @@ class UserController extends BaseController
      */
     public function destroy(User $user): JsonResponse
     {
+
+        if (auth()->user()->role_name !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $user->delete();
    
         return $this->sendResponse([], 'user deleted successfully.');

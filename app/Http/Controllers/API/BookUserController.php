@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Book;
+
+class BookUserController extends Controller
+{
+    public function index()
+    {
+        $bookUsers = Book::with('users')->get();
+        return response()->json($bookUsers);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'book_id' => 'required|exists:books,id',
+            'condition' => 'required|string',
+            'status' => 'required|string',
+            'note' => 'nullable|string',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->books()->attach($request->book_id, [
+            'condition' => $request->condition,
+            'status' => $request->status,
+            'note' => $request->note,
+        ]);
+
+        return response()->json(['message' => 'book assigned to user successfully'],201);
+}
+
+    public function show($user_id, $book_id)
+    {
+        $user = User::findOrFail($user_id);
+        $book = $user->books()->where('book_id', $book_id)->first();
+
+        if (!$book) {
+            return response()->json(['message' => 'Book not found for this user'], 404);
+        }
+
+        return response()->json($book->pivot);
+    }
+
+    public function update(Request $request, $user_id, $book_id)
+    {
+        $validated = $request->validate([
+            'condition' => 'sometimes|string',
+            'status' => 'sometimes|string',
+            'note' => 'nullable|string',
+        ]);
+
+        $user = User::findOrFail($user_id);
+        // go over and learn this code
+        if (!$user->books()->where('book_id', $book_id)->exists()) {
+            return response()->json(['message' => 'Book not found for this user'], 404);
+        }
+
+        $user->books()->updateExistingPivot($book_id, $validated);
+
+        return response()->json(['message' => 'Book-user relationship updated successfully']);
+    }
+
+    public function destroy($user_id, $book_id)
+    {
+        $user = User::findOrFail($user_id);
+
+        if (!$user->books()->where('book_id', $book_id)->exists()) {
+            return response()->json(['message' => 'Book not found for this user'], 404);
+        }
+        $user->books()->detach($book_id);
+
+    return response()->json(['message' => 'Book removed from user successfully']);
+    }
+}

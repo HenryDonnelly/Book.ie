@@ -21,4 +21,11 @@ class Book extends Model
         'isbn',
         'image',
     ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'book_user')
+                ->withPivot('condition', 'status', 'note')
+                ->withTimestamps();
+    }
 }

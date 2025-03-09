@@ -15,6 +15,8 @@ use App\Http\Controllers\API\BookController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\API\BookUserController;
+
 
    
 Route::controller(RegisterController::class)->group(function(){
@@ -32,4 +34,12 @@ Route::middleware('auth:sanctum')->group( function () {
 
 Route::middleware(['auth:sanctum','admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/book-user', [BookUserController::class, 'index']);  // List all book-user entries
+    Route::post('/book-user', [BookUserController::class, 'store']); // Assign book to user
+    Route::get('/book-user/{user_id}/{book_id}', [BookUserController::class, 'show']); // Get single entry
+    Route::put('/book-user/{user_id}/{book_id}', [BookUserController::class, 'update']); // Update book-user
+    Route::delete('/book-user/{user_id}/{book_id}', [BookUserController::class, 'destroy']); // Remove book from user
 });
