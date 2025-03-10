@@ -18,6 +18,7 @@ use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\API\BookUserController;
 use App\Http\Controllers\API\GenreController;
 use App\Http\Controllers\API\BookUserImageController;
+use App\Http\Controllers\API\TradeController;
 
 
 
@@ -56,6 +57,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/book-user-image/{bookUserId}', [BookUserImageController::class, 'index']);
     Route::delete('/book-user-image/{id}', [BookUserImageController::class, 'destroy']);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/trade', [TradeController::class, 'requestTrade']);
+    Route::post('/trade/{id}/respond', [TradeController::class, 'respondTrade']);
+    Route::get('/trades', [TradeController::class, 'getUserTrades']); 
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/trades', [TradeController::class, 'index']);
+    Route::post('/trades', [TradeController::class, 'store']);
+    Route::post('/trades/{tradeId}/accept', [TradeController::class, 'accept']);
+    Route::post('/trades/{tradeId}/reject', [TradeController::class, 'reject']);
+    Route::post('/trades/{tradeId}/cancel', [TradeController::class, 'cancel']);
+});
+
 
 
 
