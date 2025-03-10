@@ -6,14 +6,40 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Book;
+use App\Models\BookUser;
+use App\Http\Controllers\API\BookUserController;
+
 
 class BookUserController extends Controller
 {
     public function index()
-    {
-        $bookUsers = Book::with('users')->get();
-        return response()->json($bookUsers);
-    }
+{
+    $bookUsers = BookUser::with(['book', 'user', 'images'])->get();
+
+    // Restructure data
+    $formattedData = $bookUsers->map(function ($bookUser) {
+        return [
+            'book' => $bookUser->book, // Book details
+            'user' => $bookUser->user, // User details
+            'book_user' => [ // Pivot details
+                'id' => $bookUser->id,
+                'condition' => $bookUser->condition,
+                'status' => $bookUser->status,
+                'note' => $bookUser->note,
+                'images' => $bookUser->images,
+                'created_at' => $bookUser->created_at,
+                'updated_at' => $bookUser->updated_at
+            ]
+        ];
+    });
+
+    return response()->json([
+        'success' => true,
+        'data' => $formattedData
+    ]);
+}
+
+    
 
     public function store(Request $request)
     {

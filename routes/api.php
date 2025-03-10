@@ -17,6 +17,8 @@ use App\Http\Controllers\API\AdminController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\API\BookUserController;
 use App\Http\Controllers\API\GenreController;
+use App\Http\Controllers\API\BookUserImageController;
+
 
 
    
@@ -48,4 +50,12 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group( function () {
     Route::apiResource('genres', GenreController::class);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/book-user-image', [BookUserImageController::class, 'store']); 
+    Route::get('/book-user-image/{bookUserId}', [BookUserImageController::class, 'index']);
+    Route::delete('/book-user-image/{id}', [BookUserImageController::class, 'destroy']);
+});
+
+
 

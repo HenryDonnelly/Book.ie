@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_book_images', function (Blueprint $table) {
+        Schema::create('book_user_images', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('book_user_id')->constrained('book_user')->onDelete('cascade');
             $table->string('name');
-            $table->integer('book_user_id');
             $table->timestamps();
-
-            // fk linking to book user
-            $table->foreign('book_user_id')->references('id')->on('book_user')->onDelete('cascade');
         });
     }
 
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_book_images');
+        Schema::dropIfExists('book_user_images');
     }
 };

@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('username')->unique()->nullable()->after('email');
+            $table->string('username')->unique()->nullable()->after('email'); // USERNAME SHOULDNT BE NUll, trading with users is done by checking usernames
             $table->string('phone_number')->nullable()->after('address');
             $table->string('role_name')->default('free user')->after('phone_number');
         });
