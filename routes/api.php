@@ -16,6 +16,7 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\API\BookUserController;
+use App\Http\Controllers\API\GenreController;
 
 
    
@@ -43,3 +44,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/book-user/{user_id}/{book_id}', [BookUserController::class, 'update']); // Update book-user
     Route::delete('/book-user/{user_id}/{book_id}', [BookUserController::class, 'destroy']); // Remove book from user
 });
+
+Route::middleware('auth:sanctum')->group( function () {
+    Route::apiResource('genres', GenreController::class);
+});
+

@@ -28,4 +28,8 @@ class Book extends Model
                 ->withPivot('condition', 'status', 'note')
                 ->withTimestamps();
     }
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'book_genre');
+    }
 }

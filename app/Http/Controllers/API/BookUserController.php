@@ -17,15 +17,16 @@ class BookUserController extends Controller
 
     public function store(Request $request)
     {
+        // dont want user to pick which user owns the book, should always be self, so removed from validate and added check 
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'book_id' => 'required|exists:books,id',
             'condition' => 'required|string',
             'status' => 'required|string',
             'note' => 'nullable|string',
         ]);
 
-        $user = User::findOrFail($request->user_id);
+        $user = auth()->user();
+
         $user->books()->attach($request->book_id, [
             'condition' => $request->condition,
             'status' => $request->status,

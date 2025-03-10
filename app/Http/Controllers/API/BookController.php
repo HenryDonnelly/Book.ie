@@ -38,15 +38,23 @@ class BookController extends BaseController
             'description' => 'nullable',
             'isbn' => 'nullable',
             'image' => 'nullable',
+            'genres' => 'array', // Ensure genres is an array
+            'genres.*' => 'exists:genres,id'
         ]);
    
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());       
         }
    
-        $book = Book::create($input);
-   
-        return $this->sendResponse(new BookResource($book), 'book created successfully.');
+        // no genres initially
+        $book = Book::create($request->only(['title', 'author', 'description', 'isbn', 'image']));
+
+        // attach genres if provided
+        if ($request->has('genres')) {
+            $book->genres()->attach($request->genres);
+        }
+    
+        return $this->sendResponse(new BookResource($book->load('genres')), 'book created successfully.');
     } 
    
     /**

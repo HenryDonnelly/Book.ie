@@ -23,6 +23,8 @@ class BookResource extends JsonResource
             'image' => $this->image,
             'created_at' => $this->created_at->format('d/m/Y'),
             'updated_at' => $this->updated_at->format('d/m/Y'),
+            'genres' => $this->genres->map(fn($genre) => ['id' => $genre->id, 'name' => $genre->name]),
+
         ];
     }
 }
