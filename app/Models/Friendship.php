@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Trade extends Model
+class Friendship extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['requester_id', 'receiver_id', 'trade_data', 'status'];
-
-    // learn this code 
-    protected $casts = [
-        'trade_data' => 'array', 
+    protected $fillable = [
+        'requester_id',
+        'receiver_id',
+        'status',
     ];
+
 
     public function requester()
     {
@@ -25,5 +25,4 @@ class Trade extends Model
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
-
 }

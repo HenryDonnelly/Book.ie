@@ -19,6 +19,12 @@ use App\Http\Controllers\API\BookUserController;
 use App\Http\Controllers\API\GenreController;
 use App\Http\Controllers\API\BookUserImageController;
 use App\Http\Controllers\API\TradeController;
+use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\CommentController;
+use App\Http\Controllers\API\ReviewController;
+use App\Http\Controllers\API\FriendshipController;
+
+
 
 
 
@@ -41,11 +47,11 @@ Route::middleware(['auth:sanctum','admin'])->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/book-user', [BookUserController::class, 'index']);  // List all book-user entries
-    Route::post('/book-user', [BookUserController::class, 'store']); // Assign book to user
-    Route::get('/book-user/{user_id}/{book_id}', [BookUserController::class, 'show']); // Get single entry
-    Route::put('/book-user/{user_id}/{book_id}', [BookUserController::class, 'update']); // Update book-user
-    Route::delete('/book-user/{user_id}/{book_id}', [BookUserController::class, 'destroy']); // Remove book from user
+    Route::get('/book-user', [BookUserController::class, 'index']);
+    Route::post('/book-user', [BookUserController::class, 'store']); 
+    Route::get('/book-user/{user_id}/{book_id}', [BookUserController::class, 'show']); 
+    Route::put('/book-user/{user_id}/{book_id}', [BookUserController::class, 'update']);
+    Route::delete('/book-user/{user_id}/{book_id}', [BookUserController::class, 'destroy']); 
 });
 
 Route::middleware('auth:sanctum')->group( function () {
@@ -71,6 +77,43 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/trades/{tradeId}/reject', [TradeController::class, 'reject']);
     Route::post('/trades/{tradeId}/cancel', [TradeController::class, 'cancel']);
 });
+
+Route::middleware('auth:sanctum')->group( function () {
+    Route::resource('posts', PostController::class);
+});
+
+
+// linked to specific posts, not standalone entity
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('posts/{postId}/comments', [CommentController::class, 'store']);
+    Route::put('comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('comments/{comment}', [CommentController::class, 'destroy']);
+    Route::get('comments/{comment}', [CommentController::class, 'show']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('books/{bookId}/reviews', [ReviewController::class, 'store']);
+    Route::put('reviews/{review}', [ReviewController::class, 'update']);
+    Route::delete('reviews/{review}', [ReviewController::class, 'destroy']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/friendships', [FriendshipController::class, 'store']);
+    Route::post('/friendships/{friendshipId}/accept', [FriendshipController::class, 'accept']);
+    Route::post('/friendships/{friendshipId}/reject', [FriendshipController::class, 'reject']);
+    Route::post('/friendships/{friendshipId}/cancel', [FriendshipController::class, 'cancel']);
+    Route::get('/friendships', [FriendshipController::class, 'index']);
+    Route::get('/friendships/requests/{status}', [FriendshipController::class, 'getRequestsByStatus']);
+});
+
+use App\Http\Controllers\API\ChatController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+    Route::get('/chat/{friendId}/messages', [ChatController::class, 'getNewMessages']);
+});
+
+
 
 
 

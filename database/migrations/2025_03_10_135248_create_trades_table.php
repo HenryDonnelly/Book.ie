@@ -15,10 +15,11 @@ return new class extends Migration
         $table->id();
         $table->foreignId('requester_id')->constrained('users')->onDelete('cascade'); // Who is requesting the trade
         $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade'); // Who is receiving the request
-        $table->foreignId('requester_book_id')->nullable()->constrained('book_user')->onDelete('cascade'); // The book the requester is offering
-        $table->foreignId('receiver_book_id')->nullable()->constrained('book_user')->onDelete('cascade'); // The book the receiver is offering
-        $table->enum('status', ['pending', 'accepted', 'declined', 'cancelled'])->default('pending');
+        $table->json('trade_data')->nullable();
+        $table->enum('status', ['pending', 'accepted', 'rejected', 'cancelled'])->default('pending');
         $table->timestamps();
+        $table->foreign('requester_id')->references('id')->on('users')->onDelete('cascade');
+        $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
     });
 }  
 

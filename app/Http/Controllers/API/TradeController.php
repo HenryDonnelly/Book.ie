@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Trade;
 use App\Models\BookUser;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class TradeController extends Controller
 {
@@ -15,61 +18,58 @@ class TradeController extends Controller
     {
         $userId = Auth::id();
 
-        $sentTrades = Trade::where('requester_id', $userId)
-            ->with(['receiver', 'requesterBook', 'receiverBook'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $receivedTrades = Trade::where('receiver_id', $userId)
-            ->with(['requester', 'requesterBook', 'receiverBook'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $trades = Trade::where('requester_id', $userId)
+        ->orWhere('receiver_id', $userId)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
         return response()->json([
             'success' => true,
-            'sent_trades' => $sentTrades,
-            'received_trades' => $receivedTrades
+            'data' => $trades,
+            'message' => 'trades received successfully'
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'requester_book_id' => 'nullable|exists:book_users,id', // can be null (offering nothing)
-            'receiver_book_id' => 'nullable|exists:book_users,id', // can be null (receiving nothing)
-            'receiver_id' => 'required|exists:users,id' // the user to trade with
+            'requester_book_ids' => 'array', // array of offered books 
+            'requester_book_ids.*' => 'exists:book_user,id', // validate if exists
+            'receiver_book_ids' => 'array', // array of requested books
+            'receiver_book_ids.*' => 'exists:book_user,id', // validate
+            'receiver_id' => 'required|exists:users,id' // more validate user exist
         ]);
-
         $requesterId = Auth::id();
 
         // Ensure the requester owns the book they are offering (if any)
-        if ($request->requester_book_id) {
-            $requesterBook = BookUser::where('id', $request->requester_book_id)
+        if (!empty($request->requester_book_ids)) {
+            $requesterBook = BookUser::whereIn('id', $request->requester_book_ids)
                 ->where('user_id', $requesterId)
-                ->first();
+                ->count();
 
-            if (!$requesterBook) {
-                return response()->json(['success' => false, 'message' => 'You do not own the book you are offering.'], 403);
-            }
+                if ($requesterBook != count($request->requester_book_ids)) {
+                    return response()->json(['success' => false, 'message' => 'you dont own one or more of the books you are offering.'], 403);
+                }
         }
 
         // Ensure the receiver owns the book they are being asked for (if any)
-        if ($request->receiver_book_id) {
-            $receiverBook = BookUser::where('id', $request->receiver_book_id)
+        if (!empty($request->receiver_book_ids)) {
+            $requesterBook = BookUser::whereIn('id', $request->receiver_book_ids)
                 ->where('user_id', $request->receiver_id)
-                ->first();
+                ->count();
 
-            if (!$receiverBook) {
-                return response()->json(['success' => false, 'message' => 'The receiver does not own the book you are requesting.'], 403);
-            }
+                if ($requesterBook != count($request->receiver_book_ids)) {
+                    return response()->json(['success' => false, 'message' => 'the receiver doesnt own one or more books you are requesting.'], 403);
+                }
         }
 
         $trade = Trade::create([
             'requester_id' => $requesterId,
             'receiver_id' => $request->receiver_id,
-            'requester_book_id' => $request->requester_book_id,
-            'receiver_book_id' => $request->receiver_book_id,
-            'status' => 'pending'
+            'trade_data' => json_encode([
+                'requester_books' => array_values($request->requester_book_ids ?? []),
+                'receiver_books' => array_values($request->receiver_book_ids ?? [])
+]),         'status' => 'pending'
         ]);
 
         return response()->json([
@@ -86,8 +86,23 @@ class TradeController extends Controller
             ->where('status', 'pending')
             ->firstOrFail();
 
+        $tradeData = json_decode($trade->trade_data, true)?? [];
+        $requesterBookIds = $tradeData['requester_books'] ?? [];
+        $receiverBookIds = $tradeData['receiver_books'] ?? [];
+
+        \DB::transaction(function () use ($requesterBookIds, $receiverBookIds, $trade) {
+        // assign requester’s books to receiver
+        if (!empty($requesterBookIds)) {
+        BookUser::whereIn('id', $requesterBookIds)->update(['user_id' => $trade->receiver_id]);
+        }
+        // assign receiver’s books to requester
+        if (!empty($receiverBookIds)) {
+        BookUser::whereIn('id', $receiverBookIds)->update(['user_id' => $trade->requester_id]);
+        }
+
         // mark trade as accepted
         $trade->update(['status' => 'accepted']);
+    });
 
         return response()->json([
             'success' => true,
