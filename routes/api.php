@@ -23,11 +23,7 @@ use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\FriendshipController;
-
-
-
-
-
+use App\Http\Controllers\API\ChatController;
    
 Route::controller(RegisterController::class)->group(function(){
     Route::post('register', 'register');
@@ -105,8 +101,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/friendships', [FriendshipController::class, 'index']);
     Route::get('/friendships/requests/{status}', [FriendshipController::class, 'getRequestsByStatus']);
 });
-
-use App\Http\Controllers\API\ChatController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
