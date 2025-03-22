@@ -34,6 +34,9 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::resource('books', BookController::class);
 });
 
+// if user used isbn 
+Route::post('/books/fill-via-isbn', [BookController::class, 'storeFromIsbn'])->middleware('auth:sanctum');
+
 Route::middleware('auth:sanctum')->group( function () {
     Route::resource('users', UserController::class);
 });

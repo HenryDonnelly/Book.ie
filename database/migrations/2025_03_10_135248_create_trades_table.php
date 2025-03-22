@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up()
     {
-    Schema::create('trades', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('requester_id')->constrained('users')->onDelete('cascade'); // Who is requesting the trade
-        $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade'); // Who is receiving the request
-        $table->json('trade_data')->nullable();
-        $table->enum('status', ['pending', 'accepted', 'rejected', 'cancelled'])->default('pending');
-        $table->timestamps();
-        $table->foreign('requester_id')->references('id')->on('users')->onDelete('cascade');
-        $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
-    });
-}  
+        Schema::create('trades', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('requester_id')->constrained('users')->onDelete('cascade'); // Already creates FK
+            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade'); // Already creates FK
+            $table->json('trade_data')->nullable();
+            $table->enum('status', ['pending', 'accepted', 'rejected', 'cancelled'])->default('pending');
+            $table->timestamps();
+        });
+    }
+    
 
     /**
      * Reverse the migrations.

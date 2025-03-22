@@ -8,6 +8,7 @@ use App\Models\Book;
 use Validator;
 use App\Http\Resources\BookResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Http;
    
 class BookController extends BaseController
 {
@@ -118,6 +119,75 @@ class BookController extends BaseController
    
         return $this->sendResponse(new BookResource($book), 'book updated successfully.');
     }
+
+    public function storeFromIsbn(Request $request)
+    {
+    $request->validate([
+        'isbn' => 'required|string'
+    ]);
+
+    $isbn = $request->isbn;
+
+    $existingBook = Book::where('isbn', $isbn)->first();
+    if ($existingBook) {
+        return response()->json([
+            'success' => false,
+            'message' => 'This ISBN already exists in the database.',
+            'data' => $existingBook
+        ], 409);
+    }
+    $response = Http::get("https://openlibrary.org/isbn/{$isbn}.json");
+
+    if (!$response->ok()) {
+        return response()->json(['message' => 'Book not found from OpenLibrary'], 404);
+    }
+
+    $data = $response->json();
+
+    // author is required, so im setting name to be unknown should author key not appear 
+    $authorName = 'Unknown';
+        if (!empty($data['authors'][0]['key'])) {
+            $authorKey = $data['authors'][0]['key'];
+            $authorResponse = Http::get("https://openlibrary.org{$authorKey}.json");
+
+        if ($authorResponse->ok() && isset($authorResponse['name'])) {
+            $authorName = $authorResponse['name'];
+    }
+    }
+
+    // dealing with returned descriptions having different formats
+    $description = data_get($data, 'description.value') 
+        ?? data_get($data, 'description') 
+        ?? 'No description available';
+
+    $subjects = $data['subjects'] ?? [];
+
+
+    // Store each subject as a new genre if not already existing
+    $genreIds = [];
+    foreach ($subjects as $subject) {
+        $genre = Genre::firstOrCreate(['name' => $subject]);
+        $genreIds[] = $genre->id;
+    }
+
+    $coverUrl = "https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg";
+
+
+    $book = Book::create([
+        'title' => $data['title'] ?? 'Untitled',
+        'author' => $authorName,
+        'description' => $description,
+        'isbn' => $isbn,
+        'image' => $coverUrl,
+    ]);
+    $book->genres()->attach($genreIds);
+
+    return response()->json([
+        'success' => true,
+        'data' => $book->load('genres'),
+        'message' => 'Book added successfully from OpenLibrary'
+    ]);
+}
    
     /**
      * Remove the specified resource from storage.
