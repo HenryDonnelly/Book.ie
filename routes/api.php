@@ -43,6 +43,8 @@ Route::middleware('auth:sanctum')->group( function () {
 
 Route::middleware(['auth:sanctum','admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    Route::post('/admin/make-admin/{id}', [AdminController::class, 'makeAdmin']); 
+    Route::post('/admin/remove-admin/{id}', [AdminController::class, 'removeAdmin']); 
 });
 
 Route::middleware('auth:sanctum')->group(function () {
