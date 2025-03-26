@@ -11,7 +11,7 @@ class BookUserImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['book_user_id', 'name'];
+    protected $fillable = ['book_user_id', 'image'];
 
     public function bookUser()
     {
