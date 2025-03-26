@@ -109,7 +109,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
-    Route::get('/chat/{friendId}/messages', [ChatController::class, 'getNewMessages']);
+    Route::get('/chat/{friendshipId}/messages', [ChatController::class, 'getNewMessages']);
 });
 
 

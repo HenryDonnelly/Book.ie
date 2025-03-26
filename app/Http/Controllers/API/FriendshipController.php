@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Friendship;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,11 +13,12 @@ class FriendshipController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'receiver_id' => 'required|exists:users,id',
+            'username' => 'required|exists:users,username',
         ]);
 
         $requesterId = Auth::id();
-        $receiverId = $request->receiver_id;
+        $receiver = \App\Models\User::where('username', $request->username)->firstOrFail();
+        $receiverId = $receiver->id;
 
         // user cannot send a friend request to themselves
         if ($requesterId == $receiverId) {
@@ -42,10 +44,15 @@ class FriendshipController extends Controller
             'status' => 'pending',
         ]);
 
+        $requesterUsername = \App\Models\User::find($requesterId)->username;
+        $receiverUsername = $receiver->username;
+
         return response()->json([
             'success' => true,
             'message' => 'Friendship request sent successfully.',
             'data' => $friendship,
+            'requester_username' => $requesterUsername,
+            'receiver_username' => $receiverUsername,
         ]);
     }
 
@@ -58,10 +65,15 @@ class FriendshipController extends Controller
 
         $friendship->update(['status' => 'accepted']);
 
+        $requesterUsername = \App\Models\User::find($friendship->requester_id)->username;
+        $receiverUsername = \App\Models\User::find($friendship->receiver_id)->username;
+
         return response()->json([
             'success' => true,
             'message' => 'Friendship request accepted.',
             'data' => $friendship,
+            'requester_username' => $requesterUsername,
+            'receiver_username' => $receiverUsername,
         ]);
     }
 
@@ -74,10 +86,15 @@ class FriendshipController extends Controller
 
         $friendship->update(['status' => 'rejected']);
 
+        $requesterUsername = \App\Models\User::find($friendship->requester_id)->username;
+        $receiverUsername = \App\Models\User::find($friendship->receiver_id)->username;
+
         return response()->json([
             'success' => true,
             'message' => 'Friendship request rejected.',
             'data' => $friendship,
+            'requester_username' => $requesterUsername,
+            'receiver_username' => $receiverUsername,
         ]);
     }
 
@@ -105,6 +122,11 @@ class FriendshipController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+            $friendships->each(function ($friendship) {
+                $friendship->requester_username = \App\Models\User::find($friendship->requester_id)->username;
+                $friendship->receiver_username = \App\Models\User::find($friendship->receiver_id)->username;
+            });
+
         return response()->json([
             'success' => true,
             'data' => $friendships,
@@ -127,6 +149,11 @@ class FriendshipController extends Controller
                 ->orWhere('receiver_id', $userId)
                 ->where('status', $status);
         })->get();
+
+        $friendships->each(function ($friendship) {
+            $friendship->requester_username = \App\Models\User::find($friendship->requester_id)->username;
+            $friendship->receiver_username = \App\Models\User::find($friendship->receiver_id)->username;
+        });
 
         return response()->json([
             'success' => true,

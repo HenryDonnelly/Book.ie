@@ -5,69 +5,51 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Chat;
+use App\Models\Friendship;
 use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
     // Slow polling to check for new messages
-    public function getNewMessages(Request $request, $friendId)
+    public function getNewMessages(Request $request, $friendshipId)
     {
         $userId = Auth::id();
         
-        if (!$friendId || $userId == $friendId) {
-            return response()->json(['error' => 'Invalid friend ID'], 400);
+        if (!$friendshipId) {
+            return response()->json(['error' => 'Invalid friendship ID'], 400);
         }
 
-        // timeout duration for long polling
-        $timeout = 30;
-
-        // Start time to check how long the polling request has been active
-        $startTime = time();
-
-        while (true) {
-            // Fetch any new messages for the chat between the two users
-            $newMessages = Chat::where(function ($query) use ($userId, $friendId) {
-                $query->where('friend_1_id', $userId)
-                      ->where('friend_2_id', $friendId);
-            })
-            ->orWhere(function ($query) use ($userId, $friendId) {
-                $query->where('friend_1_id', $friendId)
-                      ->where('friend_2_id', $userId);
-            })
-            ->where('created_at', '>', now()->subSeconds($timeout))
-            ->get();
-
-            // If there are new messages, return them to the client
-            if ($newMessages->count() > 0) {
-                return response()->json([
-                    'messages' => $newMessages,
-                ]);
-            }
-
-            // If the timeout has been reached, break the loop and return empty response
-            if (time() - $startTime >= $timeout) {
-                return response()->json([
-                    'messages' => [],
-                ]);
-            }
-
-            sleep(2); // Wait for 2 seconds before re-checking messages
-        }
+        $messages = Chat::with('sender:id,username')
+        ->where('friendship_id', $friendshipId)
+        ->orderBy('created_at', 'asc')
+        ->get()
+        ->map(function ($msg) {
+            return [
+                'id' => $msg->id,
+                'message' => $msg->message,
+                'sender_username' => $msg->sender->username,
+                'created_at' => $msg->created_at,
+            ];
+        });
+        
+        return response()->json([
+            'messages' => $messages,
+        ]);
+            
     }
+    
 
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'friend_id' => 'required|exists:users,id',
+            'friendship_id' => 'required|exists:friendships,id',
             'message' => 'required|string',
         ]);
 
         $userId = Auth::id();
-        $friendId = $request->friend_id;
 
         $chat = Chat::create([
-            'friend_1_id' => $userId,
-            'friend_2_id' => $friendId,
+            'friendship_id' => $request->friendship_id,
             'sender_id' => $userId,
             'message' => $request->message,
         ]);
