@@ -79,4 +79,37 @@ class CommentController extends BaseController
         $comment->delete();
         return $this->sendResponse([], 'Comment deleted successfully.');
     }
+    
+    public function upvote(Comment $comment)
+    {
+        $comment->increment('upvotes');
+        return $this->sendResponse(new CommentResource($comment), 'Comment upvoted successfully.');
+    }
+
+    public function toggleUpvote(Request $request, $commentId)
+    {
+        $user = auth()->user();
+
+        $comment = Comment::findOrFail($commentId);
+
+        // Get the current upvoters (store as an array)
+        $upvoters = json_decode($comment->upvoters, true) ?? [];
+
+        // If the user has already upvoted, remove the upvote
+        if (in_array($user->id, $upvoters)) {
+            // Remove the user from the upvoters list
+            $upvoters = array_diff($upvoters, [$user->id]);
+            $comment->upvotes = count($upvoters);
+            $comment->upvoters = json_encode($upvoters);
+        } else {
+            // If the user hasn't upvoted, add them to the list
+            $upvoters[] = $user->id;
+            $comment->upvotes = count($upvoters); // Increment the upvote count
+            $comment->upvoters = json_encode($upvoters); // Update the upvoters list
+        }
+
+        $comment->save(); 
+
+        return $this->sendResponse(new CommentResource($comment), 'Upvote toggled successfully.');
+    }
 }

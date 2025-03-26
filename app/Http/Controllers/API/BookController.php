@@ -66,7 +66,7 @@ class BookController extends BaseController
      */
     public function show($id): JsonResponse
     {
-        $book = Book::find($id);
+        $book = Book::with('genres', 'reviews')->find($id);
   
         if (is_null($book)) {
             return $this->sendError('book not found.');
@@ -129,12 +129,16 @@ class BookController extends BaseController
     $isbn = $request->isbn;
 
     $existingBook = Book::where('isbn', $isbn)->first();
+
     if ($existingBook) {
+        // if the book already exists, associate the authenticated user with the book
+        $existingBook->users()->attach(auth()->id());
+
         return response()->json([
-            'success' => false,
-            'message' => 'This ISBN already exists in the database.',
-            'data' => $existingBook
-        ], 409);
+            'success' => true,
+            'message' => 'This ISBN exists and you have been added as an owner.',
+            'data' => new BookResource($existingBook->load('genres', 'users'))
+        ], 200);
     }
     $response = Http::get("https://openlibrary.org/isbn/{$isbn}.json");
 

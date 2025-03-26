@@ -79,6 +79,51 @@ class TradeController extends Controller
         ]);
     }
 
+     // Modify an existing trade (Receiver updates the trade)
+     public function modifyTrade(Request $request, $tradeId)
+     {
+         $trade = Trade::findOrFail($tradeId);
+ 
+         // Ensure the receiver is the logged-in user
+         if ($trade->receiver_id !== Auth::id()) {
+             return response()->json(['success' => false, 'message' => 'Unauthorized to modify this trade.'], 403);
+         }
+ 
+             $request->validate([
+             'books_to_add' => 'array',
+             'books_to_add.*' => 'exists:book_user,id',
+             'books_to_remove' => 'array',
+             'books_to_remove.*' => 'exists:book_user,id',
+         ]);
+ 
+         // Get the current trade data
+         $tradeData = json_decode($trade->trade_data, true);
+         $requesterBooks = $tradeData['requester_books'] ?? [];
+         $receiverBooks = $tradeData['receiver_books'] ?? [];
+ 
+         // Merge current books with added/removable books
+         $newRequesterBooks = array_merge($requesterBooks, $request->books_to_add);
+         $newReceiverBooks = array_merge($receiverBooks, $request->books_to_remove);
+ 
+         // Create a new trade based on modified offer (new trade request)
+         $newTrade = Trade::create([
+             'requester_id' => $trade->receiver_id, // Receiver becomes the requester
+             'receiver_id' => $trade->requester_id, // Requester becomes the receiver
+             'trade_data' => json_encode([
+                 'requester_books' => $newRequesterBooks,
+                 'receiver_books' => $newReceiverBooks,
+             ]),
+             'status' => 'pending' // Set the status as pending for re-approval
+         ]);
+ 
+         return response()->json([
+             'success' => true,
+             'message' => 'Trade offer updated successfully, new trade request created.',
+             'data' => $newTrade
+         ]);
+     }
+ 
+
     public function accept($tradeId)
     {
         $trade = Trade::where('id', $tradeId)

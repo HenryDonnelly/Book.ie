@@ -24,6 +24,8 @@ use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\FriendshipController;
 use App\Http\Controllers\API\ChatController;
+use App\Http\Controllers\API\WishlistController;
+
    
 Route::controller(RegisterController::class)->group(function(){
     Route::post('register', 'register');
@@ -39,6 +41,12 @@ Route::post('/books/fill-via-isbn', [BookController::class, 'storeFromIsbn'])->m
 
 Route::middleware('auth:sanctum')->group( function () {
     Route::resource('users', UserController::class);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/self', [UserController::class, 'showSelf']);
+    Route::put('/self', [UserController::class, 'updateSelf']);
+    Route::delete('/self', [UserController::class, 'destroySelf']);
 });
 
 Route::middleware(['auth:sanctum','admin'])->group(function () {
@@ -77,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/trades/{tradeId}/accept', [TradeController::class, 'accept']);
     Route::post('/trades/{tradeId}/reject', [TradeController::class, 'reject']);
     Route::post('/trades/{tradeId}/cancel', [TradeController::class, 'cancel']);
+    Route::post('/trades/{tradeId}/modify', [TradeController::class, 'modifyTrade']);
 });
 
 Route::middleware('auth:sanctum')->group( function () {
@@ -90,6 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('comments/{comment}', [CommentController::class, 'update']);
     Route::delete('comments/{comment}', [CommentController::class, 'destroy']);
     Route::get('comments/{comment}', [CommentController::class, 'show']);
+    Route::post('/comments/{comment}/upvote', [CommentController::class, 'toggleUpvote']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -111,6 +121,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
     Route::get('/chat/{friendshipId}/messages', [ChatController::class, 'getNewMessages']);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('wishlist', [WishlistController::class, 'index']);
+    Route::post('wishlist/add', [WishlistController::class, 'store']);
+    Route::delete('wishlist/{book_id}', [WishlistController::class, 'destroy']);
+});
+
+//testing toggle instead of endpoints
+Route::middleware('auth:sanctum')->post('/wishlist/toggle', [WishlistController::class, 'toggleWishlist']);
+
 
 
 

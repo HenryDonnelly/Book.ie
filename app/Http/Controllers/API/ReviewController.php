@@ -43,7 +43,15 @@ class ReviewController extends BaseController
         $review->comment = $request->comment;
         $review->save();
 
-        return $this->sendResponse($review, 'Review created successfully.');
+        return $this->sendResponse([
+            'id' => $review->id,
+            'book_id' => (int)$review->book_id,// manually make it as an int, was returning ""
+            'user_id' => $review->user_id,
+            'rating' => $review->rating,
+            'comment' => $review->comment,
+            'created_at' => $review->created_at,
+            'updated_at' => $review->updated_at,
+        ], 'Review created successfully.');
     }
 
     public function update(Request $request, $reviewId)

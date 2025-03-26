@@ -118,7 +118,7 @@ class UserController extends BaseController
             $user->username = $input['username'];
         }
         if (isset($input['password'])) {
-            $user->password = $input['password'];
+            $user->password = bcrypt($input['password']);
         }
         if (isset($input['address'])) {
             $user->address = $input['address'];
@@ -147,5 +147,45 @@ class UserController extends BaseController
         $user->delete();
    
         return $this->sendResponse([], 'user deleted successfully.');
+    }
+
+    public function showSelf(): JsonResponse
+    {
+        return $this->sendResponse(new UserResource(auth()->user()), 'current user retrieved successfully.');
+    }
+
+    public function updateSelf(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+
+        $validator = Validator::make($request->all(), [
+            'name'=> 'sometimes|string',
+            // unique email checks
+            'email'=> 'sometimes|email|unique:users,email,' . $user->id,
+            // Notice: no username update allowed!
+            'password'=> 'sometimes',
+            'address'=> 'sometimes',
+            'phone_number'=> 'sometimes'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());       
+        }
+
+        if ($request->filled('name')) $user->name = $request->name;
+        if ($request->filled('email')) $user->email = $request->email;
+        if ($request->filled('password')) $user->password = bcrypt($request->password);
+        if ($request->filled('address')) $user->address = $request->address;
+        if ($request->filled('phone_number')) $user->phone_number = $request->phone_number;
+
+        $user->save();
+        return $this->sendResponse(new UserResource($user), 'your account has been updated.');
+    }
+
+    public function destroySelf(): JsonResponse
+    {
+        $user = auth()->user();
+        $user->delete();
+        return $this->sendResponse([], 'your account has been deleted.');
     }
 }
