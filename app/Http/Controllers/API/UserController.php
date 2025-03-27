@@ -18,9 +18,9 @@ class UserController extends BaseController
      */
     public function index(): JsonResponse
     {
-        if (auth()->user()->role_name !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // if (auth()->user()->role_name !== 'admin') {
+        //     return response()->json(['error' => 'Unauthorized'], 403);
+        // }
 
         $users = User::all();
     
@@ -69,9 +69,9 @@ class UserController extends BaseController
     {
         $user = User::find($id);
   
-        if (is_null($user)) {
-            return $this->sendError('user not found.');
-        }
+        // if (is_null($user)) {
+        //     return $this->sendError('user not found.');
+        // }
    
         return $this->sendResponse(new UserResource($user), 'user retrieved successfully.');
     }
