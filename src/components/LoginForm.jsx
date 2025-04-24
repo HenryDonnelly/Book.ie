@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../utils/useAuth"; // Import useAuth
 
 const LoginForm = () => {
@@ -53,7 +53,11 @@ const LoginForm = () => {
         <button type="submit" className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
           Login
         </button>
+
+        <h1 className="mt-4">Don't have an account? Register <Link className="text-blue-500 hover:text-blue-800" to={"/register"}>Here</Link></h1>
+
       </form>
+
     </div>
   );
 };

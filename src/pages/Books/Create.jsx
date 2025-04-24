@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import SidebarNav from '../../components/SideBar'; // Ensure the path is correct
+import SidebarNav from '../../components/SideBar';
 import { useAuth } from '../../utils/useAuth';
 
 const CreateBook = () => {
@@ -98,13 +98,11 @@ const CreateBook = () => {
         setAuthor(book.author_name ? book.author_name.join(', ') : '');
         setDescription(book.first_sentence ? book.first_sentence[0] : 'No description available');
         
-        // Extract ISBN from the `isbn` field or `ia` array
         const extractedIsbn = book.isbn && book.isbn.length > 0 ? book.isbn[0] : (book.ia && book.ia.length > 0 ? book.ia[0] : '');
         setIsbn(extractedIsbn);
         
         setImage(book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg` : null);
 
-        // Match genres with the genresList
         const matchedGenres = genresList.filter(genre => book.subject && book.subject.includes(genre.name));
         setSelectedGenres(matchedGenres.map(genre => genre.id));
 

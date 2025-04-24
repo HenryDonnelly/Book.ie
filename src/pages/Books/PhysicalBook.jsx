@@ -1,130 +1,95 @@
-// filepath: /C:/Users/Kaho/Desktop/bookie-app/src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Form, Button } from 'react-bootstrap';
-import { FaHeart } from 'react-icons/fa';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../../css/Home.css'; // Ensure this path is correct
-import Navbar from '../../components/Navbar'; // Ensure this path is correct
+import axios from 'axios';
+import { useParams, Link } from 'react-router-dom';
+import SidebarNav from '../../components/SideBar';
+import { useAuth } from '../../utils/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const PhysicalBook = () => {
-  const [theme, setTheme] = useState('light');
+  const { token } = useAuth();
+  const { userId, bookId } = useParams();
+  const [bookUser, setBookUser] = useState(null);
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('https://bookie.laravel.cloud/api/self', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCurrentUser(response.data.data);
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
+    if (token) fetchCurrentUser();
+  }, [token]);
+
+
+  const handleDelete = async () => {
+    if (currentUser?.id !== bookUser.user_id) {
+      alert("You are not authorized to delete this listing.");
+      return;
+    }
+  
+    const confirmDelete = window.confirm("Are you sure you want to delete this listing?");
+    if (!confirmDelete) return;
+  
+    try {
+      await axios.delete(`https://bookie.laravel.cloud/api/book-user/${bookUser.user_id}/${bookUser.book_id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      alert("Listing deleted successfully!");
+      navigate(`/books/${bookUser.book_id}`);
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      alert("Failed to delete the listing.");
+    }
   };
+  
+  useEffect(() => {
+    if (token) {
+      // Fetch the book-user data
+      axios.get(`https://bookie.laravel.cloud/api/book-user/${userId}/${bookId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(response => {
+          console.log("Book User Data:", response.data);
+          setBookUser(response.data);
+        })
+        .catch(error => console.error('Error fetching book-user data:', error));
+    }
+  }, [token, userId, bookId]);
+
+  if (!bookUser) return <div>Loading...</div>;
 
   return (
-    <div className="home-container">
-      <Navbar />
-      <div
-        className={`toggle-button ${theme}`}
-        onClick={toggleTheme}
-      >
-        <span>{theme === 'light' ? '☀️' : '🌙'}</span>
+    <div className="flex bg-gray-100 min-h-screen">
+      <SidebarNav className="h-screen" />
+      <div className="flex-1 p-6">
+        <h1 className="text-2xl font-bold mb-4">Physical Book Details</h1>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <p><strong>Condition:</strong> {bookUser.condition}</p>
+          <p><strong>Status:</strong> {bookUser.status}</p>
+          <p><strong>Note:</strong> {bookUser.note || "No additional notes"}</p>
+          {currentUser?.id === bookUser.user_id && (
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg mt-4"
+            >
+              Delete Listing
+            </button>
+          )}
+          <div className="mt-6">
+            <Link to="/index" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
+              Back to Library
+            </Link>
+          </div>
+        </div>
       </div>
-      <Row className="ms-0 pe-1 h-100">
-        <Col md={2} className="bg-cardColour pb-3 filter-column text-textColour">
-          <h4>Filters</h4>
-          <Form>
-            <Form.Group controlId="filter1">
-              <Form.Label>Filter 1</Form.Label>
-              <Form.Control type="text" placeholder="Enter filter 1" className="input-box" />
-            </Form.Group>
-            <Form.Group controlId="filter2">
-              <Form.Label>Filter 2</Form.Label>
-              <Form.Control type="text" placeholder="Enter filter 2" className="input-box" />
-            </Form.Group>
-            <Form.Group controlId="filter3">
-              <Form.Label>Filter 3</Form.Label>
-              <Form.Control type="text" placeholder="Enter filter 3" className="input-box" />
-            </Form.Group>
-            <Form.Group controlId="genre">
-              <Form.Label>Genre</Form.Label>
-              <div className="mb-3">
-                <Form.Check 
-                  type="checkbox"
-                  id="genre1"
-                  label="Humor"
-                />
-                <Form.Check 
-                  type="checkbox"
-                  id="genre2"
-                  label="Romance novel"
-                />
-                <Form.Check 
-                  type="checkbox"
-                  id="genre3"
-                  label="Satire"
-                />
-                <Form.Check 
-                  type="checkbox"
-                  id="genre4"
-                  label="Science Fiction"
-                />
-                <Form.Check 
-                  type="checkbox"
-                  id="genre5"
-                  label="Fantasy"
-                />
-              </div>
-            </Form.Group>
-          </Form>
-        </Col>
-        <Col md={10}>
-          <Row>
-            <Col md={4}>
-              <Card className="flex-row position-relative  bg-cardColour" style={{ color: 'var(--textColour)' }}>
-                <Button variant="light" className="position-absolute top-0 end-1 m-2 p-1">
-                  <FaHeart color="red" />
-                </Button>
-                <Card.Img variant="top" src="/images/bookimage.jpg" style={{ width: '100%', height: '50%', objectFit: 'fill' }} />
-                <Card.Body className="p-3 bg-cardColour">
-                  <ul className="list-none p-0">
-                    <li><strong>Title:</strong> The Great Escape From Woodlands Nursing Home</li>
-                    <li><strong>Author:</strong> Joanna Nell</li>
-                    <li><strong>Genre:</strong> Humor, Romance novel, Satire</li>
-                  </ul>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4}>
-              <Card className="flex-row position-relative  bg-cardColour" style={{ color: 'var(--textColour)' }}>
-                <Button variant="light" className="position-absolute top-0 end-1 m-2 p-1">
-                  <FaHeart color="red" />
-                </Button>
-                <Card.Img variant="top" src="/images/bookimage.jpg" style={{ width: '100%', height: '50%', objectFit: 'fill' }} />
-                <Card.Body className="p-3 bg-cardColour">
-                  <ul className="list-none p-0">
-                    <li><strong>Title:</strong> The Great Escape From Woodlands Nursing Home</li>
-                    <li><strong>Author:</strong> Joanna Nell</li>
-                    <li><strong>Genre:</strong> Humor, Romance novel, Satire</li>
-                  </ul>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4}>
-              <Card className="flex-row position-relative  bg-cardColour" style={{ color: 'var(--textColour)' }}>
-                <Button variant="light" className="position-absolute top-0 end-1 m-2 p-1">
-                  <FaHeart color="red" />
-                </Button>
-                <Card.Img variant="top" src="/images/bookimage.jpg" style={{ width: '100%', height: '50%', objectFit: 'fill' }} />
-                <Card.Body className="p-3 bg-cardColour">
-                  <ul className="list-none p-0">
-                    <li><strong>Title:</strong> The Great Escape From Woodlands Nursing Home</li>
-                    <li><strong>Author:</strong> Joanna Nell</li>
-                    <li><strong>Genre:</strong> Humor, Romance novel, Satire</li>
-                  </ul>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-
     </div>
   );
 };

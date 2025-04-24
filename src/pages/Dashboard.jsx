@@ -3,6 +3,8 @@ import { HiUser, HiRefresh, HiClipboardList, HiBookOpen, HiChatAlt2, HiHeart, Hi
 import { Link } from 'react-router-dom';
 import { useAuth } from '../utils/useAuth';
 import SidebarNav from '../components/SideBar';
+import { Dropdown, Avatar } from "flowbite-react";
+
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -30,11 +32,29 @@ const Dashboard = () => {
             <h1 className="text-2xl font-bold mb-2">Welcome {user.name}</h1>
             <p>{formattedDate}</p>
           </div>
-          <HiUserCircle className="text-blue-500 w-12 h-12 cursor-pointer" onClick={handleLogout} title="Sign Out" />
-        </div>
+          <div className="flex mr-4 items-center space-x-4">
+            {user ? (
+              <Dropdown label={<Avatar alt="User Avatar" rounded />} inline>
+                <Dropdown.Header>
+                  <span className="block text-sm font-medium">{user.name}</span>
+                </Dropdown.Header>
+                <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+                <Dropdown.Item href="/settings">Settings</Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout} className="text-red-500">
+                  Sign Out
+                </Dropdown.Item>
+              </Dropdown>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+              >
+                Sign In
+              </button>
+            )}
+          </div>        </div>
         <div className="my-4 grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          {/* Profile */}
           <div className="md:row-span-2 bg-gray-200 rounded-lg shadow-md flex flex-col items-center text-center p-6">
             <HiUser className="text-blue-500 w-12 h-12" />
             <h2 className="text-xl font-semibold mt-3">Profile</h2>
@@ -42,7 +62,6 @@ const Dashboard = () => {
             <Link to="/profile" className="mt-3 text-blue-600 hover:underline">Go to Profile</Link>
           </div>
 
-          {/* Trade Offers & Trade History */}
           <div className="md:col-span-2 bg-gray-200 rounded-lg shadow-md">
             <h1 className="text-xl font-bold p-6 pb-0">Trades</h1>
             <div className="flex flex-col md:flex-row gap-6 p-6">
@@ -56,12 +75,12 @@ const Dashboard = () => {
                 <HiClipboardList className="text-yellow-500 w-10 h-10" />
                 <h2 className="text-lg font-semibold mt-3">Trade History</h2>
                 <p className="text-gray-500 text-sm mt-1">See past trades.</p>
-                <Link to="/trade-history" className="mt-3 text-yellow-600 hover:underline">View History</Link>
-              </div>
+                <Link to="/traderequest?tab=accepted_declined" className="mt-3 text-yellow-600 hover:underline">
+                  View History
+                </Link>              </div>
             </div>
           </div>
 
-          {/* View Books & Forums */}
           <div className="flex flex-col md:flex-row md:col-span-2 gap-6">
             <div className="flex-1 bg-gray-200 rounded-lg shadow-md flex flex-col items-center text-center p-6 h-48">
               <HiBookOpen className="text-indigo-500 w-12 h-12" />
@@ -77,7 +96,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Wishlist, Friends, My Books */}
           <div className="bg-gray-200 rounded-lg shadow-md flex flex-col items-center text-center p-6">
             <HiHeart className="text-red-500 w-10 h-10" />
             <h2 className="text-lg font-semibold mt-3">Wishlist</h2>

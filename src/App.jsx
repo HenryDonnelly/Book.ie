@@ -19,6 +19,11 @@ import CreateBook from './pages/Books/Create';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import BookUserCreate from './pages/Books/BookUserCreate';
+import AllChat from './pages/chatroom/AllChat';
+import Profile from './pages/Users/Profile';
+import UsersProfile from './pages/Users/UsersProfile';
+import TradeOffer from './pages/Trade/TradeOffer';
+import EditTradeOffer from './pages/Trade/EditTradeOffer';
 function App() {
 
   const [authenticated, setAuthenticated] = useState(false);
@@ -31,33 +36,50 @@ function App() {
   }, []);
 
   return (
-      <Router>
-            <AuthProvider>
+    <AuthProvider>
+
+    <Router>
 
         <ConditionalNavbar />
         <Routes>
           <Route path="/" element={<Dashboard />} />
+
           <Route path="/traderequest" element={<TradeRequests />} />
+          <Route path="/trade/:userId" element={<TradeOffer />} />
+          <Route path="/tradeoffer/:userId/edit/:tradeId" element={<EditTradeOffer />} />
+
+
           <Route path="/books/:id" element={<SingleBook />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/index" element={<Index />} />
           <Route path="/physicalBook" element={<PhysicalBook />} />
-          <Route path="/chat" element={<Chat />} />
+
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/users/:userId" element={<UsersProfile />} />
+
+          <Route path="/chat/:friendId" element={<Chat />} />
+          <Route path="/chats" element={<AllChat />} />
+
           <Route path="/friends" element={<FriendsList />} />
+
           <Route path="/forums" element={<Forum />} />
           <Route path="/singlePost/:id" element={<SinglePost />} />
           <Route path="/createpost" element={<CreatePost />} />
+
+          <Route path="/book-user/:userId/:bookId" element={<PhysicalBook />} />
+
+
           <Route path="/create" element={<CreateBook />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/book_user_create" element={<BookUserCreate />} />
 
-          {/* Add more routes as needed */}
         </Routes>
-        </AuthProvider>
 
-      </Router>
+    </Router>
+    </AuthProvider>
+
   );
 }
 

@@ -1,28 +1,42 @@
 import { Navbar, Dropdown, Avatar } from "flowbite-react";
-import { useAuth } from "../utils/useAuth"; // Ensure the path is correct
+import { useAuth } from "../utils/useAuth";
 import { useNavigate } from "react-router-dom";
+import { HiChevronLeft } from "react-icons/hi";
+
 
 const TopNavbar = () => {
-  const { user, logout } = useAuth(); // Get `user` and `logout` function
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); // Clear token and user state
-    navigate("/login"); // Redirect to login page
+    logout(); 
+    navigate("/login");
   };
 
   const handleLogin = () => {
-    navigate("/login"); // Redirect to login page
+    navigate("/login");
+  };
+
+  const handleBack = () => {
+    navigate(-1);
   };
 
   return (
     <Navbar fluid className="px-6 bg-blue-200">
+
+<button
+  onClick={handleBack}
+  className=" text-gray-600 text-4xl"
+>
+  <HiChevronLeft></HiChevronLeft>
+</button>
+
       <Navbar.Brand href="/">
         <span className="text-xl font-semibold">📚 Bookie</span>
       </Navbar.Brand>
 
+
       <div className="flex items-center space-x-4">
-        {/* Profile Dropdown or Sign In/Out Button */}
         {user ? (
           <Dropdown label={<Avatar alt="User Avatar" rounded />} inline>
             <Dropdown.Header>

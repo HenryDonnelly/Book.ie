@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
-import { useAuth } from "../utils/useAuth"; // Import useAuth for access to login
+import { useAuth } from "../utils/useAuth"; 
 import { useNavigate } from "react-router-dom";
 
 const RegisterForm = (props) => {
     const navigate = useNavigate();
-    const { login } = useAuth(); // Destructure login from useAuth
+    const { login } = useAuth();
 
     const [form, setForm] = useState({
         name: '',
@@ -20,17 +20,15 @@ const RegisterForm = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // First, register the user
         axios.post('https://bookie.laravel.cloud/api/register', form)
             .then((response) => {
                 console.log(response);
 
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
-                // Now, log the user in
                 login(form.email, form.password)
                     .then(() => {
-                        navigate('/'); // Navigate to the home or dashboard page
+                        navigate('/'); 
                     })
                     .catch((error) => {
                         console.error(error);

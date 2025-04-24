@@ -41,41 +41,6 @@ const FilterSidebar = () => {
                         </div>
                     )}
                 </div>
-
-                {/* Condition Dropdown */}
-                <div>
-                    <button
-                        type="button"
-                        onClick={() => setIsConditionOpen(!isConditionOpen)}
-                        className="w-full text-left p-2 border border-gray-300 rounded-lg bg-gray-100 hover:bg-gray-200"
-                    >
-                        Condition {isConditionOpen ? "▲" : "▼"}
-                    </button>
-                    {isConditionOpen && (
-                        <div className="mt-2 space-y-2">
-                            <label className="flex items-center space-x-2">
-                                <input type="checkbox" id="condition1" className="rounded border-gray-300 text-blue-500 focus:ring-blue-400" />
-                                <span>New</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                                <input type="checkbox" id="condition2" className="rounded border-gray-300 text-blue-500 focus:ring-blue-400" />
-                                <span>Fine</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                                <input type="checkbox" id="condition3" className="rounded border-gray-300 text-blue-500 focus:ring-blue-400" />
-                                <span>Very Good</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                                <input type="checkbox" id="condition4" className="rounded border-gray-300 text-blue-500 focus:ring-blue-400" />
-                                <span>Good</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                                <input type="checkbox" id="condition5" className="rounded border-gray-300 text-blue-500 focus:ring-blue-400" />
-                                <span>Poor</span>
-                            </label>
-                        </div>
-                    )}
-                </div>
             </div>
 
             <button
