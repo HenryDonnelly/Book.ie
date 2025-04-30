@@ -22,7 +22,7 @@ const TopNavbar = () => {
   };
 
   return (
-    <Navbar fluid className="px-6 bg-blue-200">
+    <Navbar fluid className="py-4 bg-blue-200">
 
 <button
   onClick={handleBack}

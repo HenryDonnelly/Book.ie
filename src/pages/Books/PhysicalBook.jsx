@@ -72,6 +72,9 @@ const PhysicalBook = () => {
       <div className="flex-1 p-6">
         <h1 className="text-2xl font-bold mb-4">Physical Book Details</h1>
         <div className="bg-white p-6 rounded-lg shadow-md">
+
+        
+          
           <p><strong>Condition:</strong> {bookUser.condition}</p>
           <p><strong>Status:</strong> {bookUser.status}</p>
           <p><strong>Note:</strong> {bookUser.note || "No additional notes"}</p>
@@ -83,7 +86,13 @@ const PhysicalBook = () => {
               Delete Listing
             </button>
           )}
-          <div className="mt-6">
+          <div className="mt-6 flex gap-4">
+            <button
+              onClick={() => navigate(`/trade/${bookUser.user_id}`)}
+              className="bg-purple-500 text-white px-4 py-2 rounded-lg"
+            >
+              Trade
+            </button>
             <Link to="/index" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
               Back to Library
             </Link>

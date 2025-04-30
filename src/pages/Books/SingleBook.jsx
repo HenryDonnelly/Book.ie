@@ -21,6 +21,9 @@ const SingleBook = () => {
   const [newReview, setNewReview] = useState({ rating: 1, comment: '' });
   const [editingReviewId, setEditingReviewId] = useState(null);
   const { user, token } = useAuth();
+  const handleTrade = () => {
+    navigate(`/trade/${userId}`); // Redirect to the TradeOffer page with the userId
+  };
 
   if (!user) return <div>Loading user info...</div>;
 
@@ -65,12 +68,12 @@ const SingleBook = () => {
         .then(response => {
           setBook(response.data.data);
           setReviews(response.data.data.reviews || []);
-          
+
           // Log the book data
           console.log("Book Data:", response.data.data);
         })
         .catch(error => console.error('Error fetching book:', error));
-  
+
       // Fetch book users
       axios.get('https://bookie.laravel.cloud/api/book-user', {
         headers: { Authorization: `Bearer ${token}` }
@@ -81,7 +84,7 @@ const SingleBook = () => {
           setFilteredBookUsers(filteredUsers); // Initialize filtered list
         })
         .catch(error => console.error('Error fetching book users:', error));
-  
+
       // Fetch wishlist
       axios.get('https://bookie.laravel.cloud/api/wishlist', {
         headers: { Authorization: `Bearer ${token}` }
@@ -312,12 +315,12 @@ const SingleBook = () => {
           <h2 className="text-xl font-bold">Traders</h2>
           <hr className="my-2 border-gray-400"></hr>
 
-            <div className='my-5'>
+          <div className='my-5'>
             <Link to={`/book_user_create?book_id=${id}`} className="bg-blue-200 text-black px-4 py-2 rounded-lg">
-            List a Book
-          </Link>
-            </div>
-          
+              List a Book
+            </Link>
+          </div>
+
           {/* Filters */}
           <div className="flex space-x-4 mb-4">
             <div>
@@ -352,17 +355,19 @@ const SingleBook = () => {
           {filteredBookUsers.length > 0 ? (
             filteredBookUsers.map((entry) => (
               <div key={entry.book_user.id} className="bg-blue-100 border p-4 rounded-lg shadow-md mb-4">
-                <h2 className="text-lg font-bold">Trader: {entry.user.name}</h2>
+                <h3 className="text-lg font-bold mb-2">Trader:&nbsp; 
+                <Link
+                  to={`/users/${entry.user.id}`}
+                  className="text-xl text-blue-500 hover:underline"
+                >
+                 {entry.user.name}
+                </Link>  
+                </h3>
                 <p>Condition: {entry.book_user.condition}</p>
                 <p>Status: {entry.book_user.status}</p>
                 <p>Note: {entry.book_user.note || 'No additional notes'}</p>
                 <p>Created At: {new Date(entry.book_user.created_at).toLocaleString()}</p>
 
-                <button
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg"
-                  onClick={() => navigate(`/book-user/${entry.user.id}/${entry.book.id}`)}                >
-                  View Trader
-                </button>
 
                 {entry.book_user.images.length > 0 ? (
                   <div className="mt-2 flex gap-2">
@@ -370,10 +375,31 @@ const SingleBook = () => {
                       <img key={img.id} src={img.image} alt="Book" className="w-20 h-20 object-cover rounded" />
                     ))}
                   </div>
+
+
                 ) : (
                   <p className="text-gray-500">No images available</p>
                 )}
+
+
+
+                <div className="mt-4 flex gap-4">
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                    onClick={() => navigate(`/book-user/${entry.user.id}/${entry.book.id}`)}                >
+                    View Book
+                  </button>
+
+                  <button
+                    onClick={handleTrade}
+                    className="bg-purple-500 text-white px-4 py-2 rounded-lg"
+                  >
+                    Trade
+                  </button>
+                </div>
               </div>
+
+
             ))
           ) : (
             <p>No traders available for this book.</p>

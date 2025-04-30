@@ -9,7 +9,7 @@ const SidebarNav = () => {
   return (
     <div className="flex h-screen">
       <Sidebar aria-label="Book Trading Sidebar" className="bg-yellow-100 flex flex-col w-64 h-full overflow-hidden">
-        <Sidebar.Items className="flex-shrink-0">
+        <Sidebar.Items className="flex-shrink-0 text-lg">
           <Sidebar.ItemGroup>
             <Sidebar.Item href="/" icon={HiHome}>Dashboard</Sidebar.Item>
             <Sidebar.Item href="/index" icon={HiBookOpen}>Library</Sidebar.Item>

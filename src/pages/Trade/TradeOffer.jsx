@@ -165,197 +165,197 @@ const TradeOffer = () => {
 
     return (
         <div className='flex'>
-                            <SidebarNav />
+            <SidebarNav />
 
             <div>
-            <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
-                <h1 className="text-2xl font-bold mb-4 md:mb-6">Trade Request</h1>
+                <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
+                    <h1 className="text-2xl font-bold mb-4 md:mb-6">Trade Request</h1>
 
-                {/* Top Section: Offers */}
-                <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
-                    {/* Box 1: Your Offer */}
-                    <div className="col-span-1 lg:col-span-4 bg-white p-4 rounded-lg shadow">
-                        <h2 className="text-lg font-bold mb-4">Your Offer</h2>
-                        {myOffer.length > 0 ? (
-                            <div className="grid gap-4">
-                                {myOffer.map(book => (
-                                    <div key={book.id} className="flex items-center space-x-4">
-                                        <img
-                                            src={book.book.image || '/images/bookimage.jpg'}
-                                            alt={`${book.book.title} cover`}
-                                            className="w-16 h-16 rounded-lg"
-                                        />
-                                        <div>
-                                            <h3 className="text-md font-bold">{book.book.title}</h3>
-                                            <p className="text-sm text-gray-500">by {book.book.author}</p>
+                    {/* Top Section: Offers */}
+                    <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
+                        {/* Box 1: Your Offer */}
+                        <div className="col-span-1 lg:col-span-4 bg-white p-4 rounded-lg shadow">
+                            <h2 className="text-lg font-bold mb-4">Your Offer</h2>
+                            {myOffer.length > 0 ? (
+                                <div className="grid gap-4">
+                                    {myOffer.map(book => (
+                                        <div key={book.id} className="flex items-center space-x-4">
+                                            <img
+                                                src={book.book.image || '/images/bookimage.jpg'}
+                                                alt={`${book.book.title} cover`}
+                                                className="w-16 h-16 rounded-lg"
+                                            />
+                                            <div>
+                                                <h3 className="text-md font-bold">{book.book.title}</h3>
+                                                <p className="text-sm text-gray-500">by {book.book.author}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleRemoveFromOffer(book, true)}
+                                                className="text-red-500 hover:underline"
+                                            >
+                                                Remove
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={() => handleRemoveFromOffer(book, true)}
-                                            className="text-red-500 hover:underline"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p>No books in your offer.</p>
-                        )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="col-span-1 flex flex-col justify-center items-stretch space-y-4">
-
-                        <button
-                            onClick={handleSubmitTrade}
-                            className="bg-purple-500 text-white px-4 py-2 rounded-lg w-full"
-                        >
-                            {isEditing ? "Submit Changes" : "Create Trade"}
-                        </button>
-
-
-                    </div>
-
-
-                    {/* Box 2: Their Offer */}
-                    <div className="col-span-1 lg:col-span-4 bg-white p-4 rounded-lg shadow">
-                        <h2 className="text-lg font-bold mb-4">Their Offer</h2>
-                        {theirOffer.length > 0 ? (
-                            <div className="grid gap-4">
-                                {theirOffer.map(book => (
-                                    <div key={book.id} className="flex items-center space-x-4">
-                                        <img
-                                            src={book.book.image || '/images/bookimage.jpg'}
-                                            alt={`${book.book.title} cover`}
-                                            className="w-16 h-16 rounded-lg"
-                                        />
-                                        <div>
-                                            <h3 className="text-md font-bold">{book.book.title}</h3>
-                                            <p className="text-sm text-gray-500">by {book.book.author}</p>
-                                        </div>
-                                        <button
-                                            onClick={() => handleRemoveFromOffer(book, false)}
-                                            className="text-red-500 hover:underline"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p>No books in their offer.</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* Bottom Section: Inventories */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-4 md:mt-8">
-                    {/* Box 3: Your Inventory */}
-                    <div className="bg-white p-4 rounded-lg shadow">
-                        <h2 className="text-lg font-bold mb-4">Your Inventory</h2>
-                        <div className="flex items-center space-x-4 mb-4">
-                            {/* Search Input */}
-                            <input
-                                type="text"
-                                placeholder="Search by title or author"
-                                className="input input-bordered w-full"
-                                onChange={(e) => setMySearchTerm(e.target.value.toLowerCase())}
-                            />
-                            {/* Condition Dropdown */}
-                            <select
-                                className="select select-bordered"
-                                onChange={(e) => setMyConditionFilter(e.target.value)}
-                            >
-                                <option value="">All Conditions</option>
-                                <option value="new">New</option>
-                                <option value="used">Used</option>
-                                <option value="good">Good</option>
-                                <option value="fair">Fair</option>
-                                <option value="poor">Poor</option>
-                            </select>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>No books in your offer.</p>
+                            )}
                         </div>
-                        {filteredMyBooks.length > 0 ? (
-                            <div className="grid gap-4">
-                                {filteredMyBooks.map(book => (
-                                    <div key={book.book_user.id} className="flex items-center space-x-4">
-                                        <img
-                                            src={book.book?.image || '/images/bookimage.jpg'}
-                                            alt={`${book.book?.title || 'Book'} cover`}
-                                            className="w-16 h-16 rounded-lg"
-                                        />
-                                        <div>
-                                            <h3 className="text-md font-bold">{book.book?.title || 'Untitled'}</h3>
-                                            <p className="text-sm text-gray-500">by {book.book?.author || 'Unknown'}</p>
-                                            <p className="text-sm text-gray-500">Condition: {book.book_user.condition}</p>
+
+                        {/* Action Buttons */}
+                        <div className="col-span-1 flex flex-col justify-center items-stretch space-y-4">
+
+                            <button
+                                onClick={handleSubmitTrade}
+                                className="bg-purple-500 text-white px-4 py-2 rounded-lg w-full"
+                            >
+                                {isEditing ? "Submit Changes" : "Create Trade"}
+                            </button>
+
+
+                        </div>
+
+
+                        {/* Box 2: Their Offer */}
+                        <div className="col-span-1 lg:col-span-4 bg-white p-4 rounded-lg shadow">
+                            <h2 className="text-lg font-bold mb-4">Their Offer</h2>
+                            {theirOffer.length > 0 ? (
+                                <div className="grid gap-4">
+                                    {theirOffer.map(book => (
+                                        <div key={book.id} className="flex items-center space-x-4">
+                                            <img
+                                                src={book.book.image || '/images/bookimage.jpg'}
+                                                alt={`${book.book.title} cover`}
+                                                className="w-16 h-16 rounded-lg"
+                                            />
+                                            <div>
+                                                <h3 className="text-md font-bold">{book.book.title}</h3>
+                                                <p className="text-sm text-gray-500">by {book.book.author}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleRemoveFromOffer(book, false)}
+                                                className="text-red-500 hover:underline"
+                                            >
+                                                Remove
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={() => handleAddToOffer(book, true)}
-                                            className="text-blue-500 hover:underline"
-                                        >
-                                            Add to Offer
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p>No books in your inventory.</p>
-                        )}
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>No books in their offer.</p>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Box 4: Their Inventory */}
-                    <div className="bg-white p-4 rounded-lg shadow">
-                        <h2 className="text-lg font-bold mb-4">Their Inventory</h2>
-                        <div className="flex items-center space-x-4 mb-4">
-                            {/* Search Input */}
-                            <input
-                                type="text"
-                                placeholder="Search by title or author"
-                                className="input input-bordered w-full"
-                                onChange={(e) => setTheirSearchTerm(e.target.value.toLowerCase())}
-                            />
-                            {/* Condition Dropdown */}
-                            <select
-                                className="select select-bordered"
-                                onChange={(e) => setTheirConditionFilter(e.target.value)}
-                            >
-                                <option value="all">All</option>
-                                <option value="New">New</option>
-                                <option value="Very Good">Very Good</option>
-                                <option value="Good">Good</option>
-                                <option value="Fair">Fair</option>
-                                <option value="Poor">Poor</option>
-                            </select>
-                        </div>
-                        {filteredTheirBooks.length > 0 ? (
-                            <div className="grid gap-4">
-                                {filteredTheirBooks.map(book => (
-                                    <div key={book.book_user.id} className="flex items-center space-x-4">
-                                        <img
-                                            src={book.book?.image || '/images/bookimage.jpg'}
-                                            alt={`${book.book?.title || 'Book'} cover`}
-                                            className="w-16 h-16 rounded-lg"
-                                        />
-                                        <div>
-                                            <h3 className="text-md font-bold">{book.book?.title || 'Untitled'}</h3>
-                                            <p className="text-sm text-gray-500">by {book.book?.author || 'Unknown'}</p>
-                                            <p className="text-sm text-gray-500">Condition: {book.book_user.condition}</p>
-                                        </div>
-                                        <button
-                                            onClick={() => handleAddToOffer(book, false)}
-                                            className="text-blue-500 hover:underline"
-                                        >
-                                            Add to Offer
-                                        </button>
-                                    </div>
-                                ))}
+                    {/* Bottom Section: Inventories */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-4 md:mt-8">
+                        {/* Box 3: Your Inventory */}
+                        <div className="bg-white p-4 rounded-lg shadow">
+                            <h2 className="text-lg font-bold mb-4">Your Inventory</h2>
+                            <div className="flex items-center space-x-4 mb-4">
+                                {/* Search Input */}
+                                <input
+                                    type="text"
+                                    placeholder="Search by title or author"
+                                    className="input input-bordered w-full"
+                                    onChange={(e) => setMySearchTerm(e.target.value.toLowerCase())}
+                                />
+                                {/* Condition Dropdown */}
+                                <select
+                                    className="select select-bordered"
+                                    onChange={(e) => setMyConditionFilter(e.target.value)}
+                                >
+                                    <option value="">All Conditions</option>
+                                    <option value="new">New</option>
+                                    <option value="fine">Fine</option>
+                                    <option value="very good">Very Good</option>
+                                    <option value="good">Good</option>
+                                    <option value="poor">Poor</option>
+                                </select>
                             </div>
-                        ) : (
-                            <p>No books in their inventory.</p>
-                        )}
+                            {filteredMyBooks.length > 0 ? (
+                                <div className="grid gap-4">
+                                    {filteredMyBooks.map(book => (
+                                        <div key={book.book_user.id} className="flex items-center space-x-4">
+                                            <img
+                                                src={book.book?.image || '/images/bookimage.jpg'}
+                                                alt={`${book.book?.title || 'Book'} cover`}
+                                                className="w-16 h-16 rounded-lg"
+                                            />
+                                            <div>
+                                                <h3 className="text-md font-bold">{book.book?.title || 'Untitled'}</h3>
+                                                <p className="text-sm text-gray-500">by {book.book?.author || 'Unknown'}</p>
+                                                <p className="text-sm text-gray-500">Condition: {book.book_user.condition}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleAddToOffer(book, true)}
+                                                className="text-blue-500 hover:underline"
+                                            >
+                                                Add to Offer
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>No books in your inventory.</p>
+                            )}
+                        </div>
+
+                        {/* Box 4: Their Inventory */}
+                        <div className="bg-white p-4 rounded-lg shadow">
+                            <h2 className="text-lg font-bold mb-4">Their Inventory</h2>
+                            <div className="flex items-center space-x-4 mb-4">
+                                {/* Search Input */}
+                                <input
+                                    type="text"
+                                    placeholder="Search by title or author"
+                                    className="input input-bordered w-full"
+                                    onChange={(e) => setTheirSearchTerm(e.target.value.toLowerCase())}
+                                />
+                                {/* Condition Dropdown */}
+                                <select
+                                    className="select select-bordered"
+                                    onChange={(e) => setTheirConditionFilter(e.target.value)}
+                                >
+                                    <option value="">All Conditions</option>
+                                    <option value="new">New</option>
+                                    <option value="fine">Fine</option>
+                                    <option value="very good">Very Good</option>
+                                    <option value="good">Good</option>
+                                    <option value="poor">Poor</option>
+                                </select>
+                            </div>
+                            {filteredTheirBooks.length > 0 ? (
+                                <div className="grid gap-4">
+                                    {filteredTheirBooks.map(book => (
+                                        <div key={book.book_user.id} className="flex items-center space-x-4">
+                                            <img
+                                                src={book.book?.image || '/images/bookimage.jpg'}
+                                                alt={`${book.book?.title || 'Book'} cover`}
+                                                className="w-16 h-16 rounded-lg"
+                                            />
+                                            <div>
+                                                <h3 className="text-md font-bold">{book.book?.title || 'Untitled'}</h3>
+                                                <p className="text-sm text-gray-500">by {book.book?.author || 'Unknown'}</p>
+                                                <p className="text-sm text-gray-500">Condition: {book.book_user.condition}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleAddToOffer(book, false)}
+                                                className="text-blue-500 hover:underline"
+                                            >
+                                                Add to Offer
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>No books in their inventory.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         </div>
 
     );

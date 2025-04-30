@@ -34,89 +34,89 @@ const EditTradeOffer = () => {
 
     useEffect(() => {
         if (!currentUserId) return;
-    
+
         // Fetch my books
         axios.get('https://bookie.laravel.cloud/api/book-user', {
             headers: { Authorization: `Bearer ${token}` }
         })
-        .then(response => {
-            const books = response.data.data;
-            const myBooksFiltered = books.filter(book => book.user.id === currentUserId);
-            setMyBooks(myBooksFiltered);
-        })
-        .catch(error => console.error("Error fetching books:", error));
-    
+            .then(response => {
+                const books = response.data.data;
+                const myBooksFiltered = books.filter(book => book.user.id === currentUserId);
+                setMyBooks(myBooksFiltered);
+            })
+            .catch(error => console.error("Error fetching books:", error));
+
         // Fetch their books
         const otherUserId = parseInt(userId);
         if (otherUserId) {
             axios.get(`https://bookie.laravel.cloud/api/book-user`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
-            .then(response => {
-                setTheirBooks(response.data.data);
-            })
-            .catch(error => console.error("Error fetching their books:", error))
-            .finally(() => {
-                setLoading(false);
-            });
+                .then(response => {
+                    setTheirBooks(response.data.data);
+                })
+                .catch(error => console.error("Error fetching their books:", error))
+                .finally(() => {
+                    setLoading(false);
+                });
         } else {
-            setLoading(false); 
+            setLoading(false);
         }
     }, [currentUserId, userId, token]);
-    
-    
-    
-    
-    
+
+
+
+
+
 
     useEffect(() => {
         if (!isEditing || !tradeId || !currentUserId) return;
-    
+
         axios.get(`https://bookie.laravel.cloud/api/trades`, {
             headers: { Authorization: `Bearer ${token}` }
         })
-        .then(res => {
-            const trade = res.data.data.find(t => t.id === parseInt(tradeId));
-    
-            if (!trade) {
-                console.error("Trade not found.");
-                return;
-            }
-    
-            console.log("Trade fetched:", trade);
+            .then(res => {
+                const trade = res.data.data.find(t => t.id === parseInt(tradeId));
 
-            const { requester_id, receiver_id, requester_books, receiver_books } = trade;
-    
-            const otherUserId = currentUserId === requester_id ? receiver_id : requester_id;
-    
-            const selectedMyBooks = currentUserId === requester_id ? requester_books : receiver_books;
-            const selectedTheirBooks = currentUserId === requester_id ? receiver_books : requester_books;
-            
-            setMyOffer(selectedMyBooks || []);
-            setTheirOffer(selectedTheirBooks || []);
-            
-            setOriginalMyOfferIds((selectedMyBooks || []).map(b => b.book_user.id));
-            setOriginalTheirOfferIds((selectedTheirBooks || []).map(b => b.book_user.id));
-            
-            // Fetch their books using the resolved otherUserId
-            axios.get(`https://bookie.laravel.cloud/api/book-user`, {
-                headers: { Authorization: `Bearer ${token}` }
+                if (!trade) {
+                    console.error("Trade not found.");
+                    return;
+                }
+
+                console.log("Trade fetched:", trade);
+
+                const { requester_id, receiver_id, requester_books, receiver_books } = trade;
+
+                const otherUserId = currentUserId === requester_id ? receiver_id : requester_id;
+
+                const selectedMyBooks = currentUserId === requester_id ? requester_books : receiver_books;
+                const selectedTheirBooks = currentUserId === requester_id ? receiver_books : requester_books;
+
+                setMyOffer(selectedMyBooks || []);
+                setTheirOffer(selectedTheirBooks || []);
+
+                setOriginalMyOfferIds((selectedMyBooks || []).map(b => b.book_user.id));
+                setOriginalTheirOfferIds((selectedTheirBooks || []).map(b => b.book_user.id));
+
+                // Fetch their books using the resolved otherUserId
+                axios.get(`https://bookie.laravel.cloud/api/book-user`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                    .then(response => {
+                        setTheirBooks(response.data.data);
+
+                    })
+                    .catch(error => console.error("Error fetching other user's books:", error)
+                    ).finally(() => {
+                        setLoading(false); // ✅ ALSO add this here if isEditing is true
+                    });
+
+
             })
-            .then(response => {
-                setTheirBooks(response.data.data);
-                
-            })
-            .catch(error => console.error("Error fetching other user's books:", error)
-        ).finally(() => {
-            setLoading(false); // ✅ ALSO add this here if isEditing is true
-        });
-        
-            
-        })
-        .catch(error => console.error("Error fetching trades:", error));
+            .catch(error => console.error("Error fetching trades:", error));
     }, [isEditing, tradeId, currentUserId, token]);
-    
-    
+
+
 
     const handleAddToOffer = (book, isMine) => {
         if (isMine) {
@@ -247,9 +247,9 @@ const EditTradeOffer = () => {
                     <select className="select select-bordered w-full mb-4" onChange={e => setMyConditionFilter(e.target.value)}>
                         <option value="">All Conditions</option>
                         <option value="new">New</option>
-                        <option value="used">Used</option>
+                        <option value="fine">Fine</option>
+                        <option value="very good">Very Good</option>
                         <option value="good">Good</option>
-                        <option value="fair">Fair</option>
                         <option value="poor">Poor</option>
                     </select>
                     {filteredMyBooks.map(book => (
@@ -271,9 +271,9 @@ const EditTradeOffer = () => {
                     <select className="select select-bordered w-full mb-4" onChange={e => setTheirConditionFilter(e.target.value)}>
                         <option value="">All Conditions</option>
                         <option value="new">New</option>
-                        <option value="used">Used</option>
+                        <option value="fine">Fine</option>
+                        <option value="very good">Very Good</option>
                         <option value="good">Good</option>
-                        <option value="fair">Fair</option>
                         <option value="poor">Poor</option>
                     </select>
                     {filteredTheirBooks.map(book => (

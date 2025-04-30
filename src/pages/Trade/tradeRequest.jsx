@@ -19,7 +19,6 @@ const TradeRequests = () => {
     const acceptedDeclinedTrades = requests.filter(req =>
         req.status === "accepted" || req.status === "rejected"
     );
-    const changedTrades = requests.filter(req => req.status === "changed");
 
     useEffect(() => {
         // Read the 'tab' query parameter and set the active tab
@@ -204,7 +203,7 @@ const TradeRequests = () => {
             <div className="flex-1 p-6 bg-gray-100">
                 <h1 className="text-2xl font-bold mb-4">Trade Requests 🔄</h1>
                 <div className="flex space-x-4 mb-4">
-                    {["pending", "changed", "accepted_declined"].map((tab) => (
+                    {["pending", "accepted_declined"].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -214,7 +213,6 @@ const TradeRequests = () => {
                                 }`}
                         >
                             {tab === "pending" && "Pending"}
-                            {tab === "changed" && "Changed Offers"}
                             {tab === "accepted_declined" && "History"}
                         </button>
                     ))}
@@ -222,11 +220,9 @@ const TradeRequests = () => {
 
                 <ul className="space-y-6">
                     {activeTab === "pending" && pendingTrades.map((req, index) => renderTradeCard(req, index))}
-                    {activeTab === "changed" && changedTrades.map((req, index) => renderTradeCard(req, index))}
-                    {activeTab === "accepted_declined" && acceptedDeclinedTrades.map((req, index) => renderTradeCard(req, index))}
+             {activeTab === "accepted_declined" && acceptedDeclinedTrades.map((req, index) => renderTradeCard(req, index))}
 
                     {activeTab === "pending" && pendingTrades.length === 0 && <p>No pending requests.</p>}
-                    {activeTab === "changed" && changedTrades.length === 0 && <p>No changed offers.</p>}
                     {activeTab === "accepted_declined" && acceptedDeclinedTrades.length === 0 && <p>No accepted/declined trades.</p>}
                 </ul>
             </div>
