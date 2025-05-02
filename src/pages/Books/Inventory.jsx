@@ -133,7 +133,7 @@ const Inventory = () => {
                                                     <option value="available">Available</option>
                                                     <option value="unavailable">Unavailable</option>
                                                 </select> */}
-                                                <a href={`/book-user/${book.user.id}/${book.book.id}`} className="ml-4 bg-blue-200 text-black px-4 py-2 rounded-lg">
+                                                <a href={`/book-user/${book.user.id}/${book.book.id}`} className=" bg-blue-200 text-black px-4 py-2 rounded-lg">
                                                     View Book
                                                 </a>
                                             </div>

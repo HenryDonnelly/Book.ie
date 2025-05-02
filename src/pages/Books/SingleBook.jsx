@@ -21,9 +21,7 @@ const SingleBook = () => {
   const [newReview, setNewReview] = useState({ rating: 1, comment: '' });
   const [editingReviewId, setEditingReviewId] = useState(null);
   const { user, token } = useAuth();
-  const handleTrade = () => {
-    navigate(`/trade/${userId}`); // Redirect to the TradeOffer page with the userId
-  };
+
 
   if (!user) return <div>Loading user info...</div>;
 
@@ -391,7 +389,7 @@ const SingleBook = () => {
                   </button>
 
                   <button
-                    onClick={handleTrade}
+                    onClick={() => navigate(`/trade/${entry.user.id}`)}
                     className="bg-purple-500 text-white px-4 py-2 rounded-lg"
                   >
                     Trade

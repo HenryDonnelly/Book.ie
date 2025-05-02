@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../utils/useAuth';
 import SidebarNav from '../components/SideBar';
 import { Dropdown, Avatar } from "flowbite-react";
+import { Navigate } from 'react-router-dom';
 
 
 const Dashboard = () => {
@@ -19,8 +20,10 @@ const Dashboard = () => {
 
   console.log(user);
 
-  if (!user) {
-    return <div>Loading...</div>;
+  if (user===null) {
+    return <div>
+      <Navigate to="/login" />
+    </div>;
   }
 
   return (

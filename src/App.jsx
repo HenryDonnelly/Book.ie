@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider } from './utils/useAuth';
 // import Layout from './pages/Layout';
 import TopNavbar from './components/Navbar2';
@@ -43,6 +43,11 @@ function App() {
         <ConditionalNavbar />
         <Routes>
           <Route path="/" element={<Dashboard />} />
+
+          <Route
+            path="/"
+            element={authenticated ? <Dashboard /> : <Navigate to="/login" />}
+          />
 
           <Route path="/traderequest" element={<TradeRequests />} />
           <Route path="/trade/:userId" element={<TradeOffer />} />
